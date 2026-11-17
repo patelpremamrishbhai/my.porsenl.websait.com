@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Education Portal</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef3ff;
+  color: #172554;
+}
+
+header {
+  background: #183b8c;
+  color: white;
+  padding: 22px;
+  text-align: center;
+}
+
+main {
+  max-width: 950px;
+  margin: 25px auto;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px #0001;
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccd5e5;
+  border-radius: 7px;
+  font-size: 16px;
+}
+
+button {
+  background: #2454c6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover { background: #163d9b; }
+
+.secondary { background: #64748b; }
+
+.page { display: none; }
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 550px;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #d8dfeb;
+  text-align: left;
+}
+
+th { background: #dce7ff; }
+
+.small { color: #64748b; font-size: 13px; }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Student Education Portal</h1>
+  <p>Student Login • Education • Study Guidance</p>
+</header>
+
+<main>
+
+<!-- PAGE 1: LOGIN -->
+<section id="loginPage" class="page card">
+  <h2>Student Login</h2>
+  <p>Enter your details to continue.</p>
+
+  <form id="loginForm">
+    <label>User Name</label>
+    <input id="username" type="text"
+           placeholder="Enter your name" required>
+
+    <label>Mobile Number</label>
+    <input id="phone" type="tel"
+           inputmode="numeric"
+           pattern="[0-9]{10}"
+           maxlength="10"
+           placeholder="10 digit mobile number" required>
+
+    <label>Your Education</label>
+    <select id="education" required>
+      <option value="">Select Education</option>
+      <option value="10th">10th Pass</option>
+      <option value="12th Science">12th Science</option>
+      <option value="Diploma Computer Engineering">
+        Diploma Computer Engineering
+      </option>
+      <option value="Diploma Other">Other Diploma</option>
+      <option value="BCA">BCA</option>
+      <option value="BTech">B.Tech / B.E.</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <button type="submit">Login & Next →</button>
+  </form>
+
+  <p class="small">
+    Demo website: information is stored only in this browser.
+  </p>
+</section>
+
+<!-- PAGE 2: ALL USERS -->
+<section id="usersPage" class="page">
+  <div class="card">
+    <h2>All Registered Students</h2>
+    <p>Students registered in this browser: <b id="total">0</b></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>User Name</th>
+            <th>Mobile Number</th>
+            <th>Education</th>
+            <th>Study Info</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+
+    <button class="secondary" onclick="showPage('loginPage')">
+      Back to Login
+    </button>
+  </div>
+</section>
+
+<!-- PAGE 3: STUDY INFORMATION -->
+<section id="studyPage" class="page">
+  <div class="card">
+    <h2 id="welcome">Study Information</h2>
+    <p id="courseName"></p>
+    <h3>Recommended Study Topics</h3>
+    <ul id="topics"></ul>
+    <h3>Next Study Options</h3>
+    <p id="nextOptions"></p>
+    <button onclick="showPage('usersPage')">
+      ← All Students
+    </button>
+    <button class="secondary" onclick="showPage('loginPage')">
+      New Student Login
+    </button>
+  </div>
+</section>
+
+</main>
+
+<footer>Student Education Portal | Demo Project</footer>
+
+<script>
+const STORAGE_KEY = "studentPortalDemoUsers";
+
+function getUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveUsers(users) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+}
+
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(page => {
+    page.style.display = "none";
+  });
+  document.getElementById(pageId).style.display = "block";
+}
+
+let currentStudent = null;
+
+const studyData = {
+  "10th": {
+    course: "After 10th",
+    topics: ["Basic Mathematics", "English", "Computer Fundamentals"],
+    next: "Explore Diploma, ITI, or 11th–12th according to your interests."
+  },
+  "12th Science": {
+    course: "After 12th Science",
+    topics: ["Physics", "Chemistry", "Mathematics or Biology", "Entrance Exam Preparation"],
+    next: "Explore B.Tech, B.Sc., BCA, or other eligible degree courses."
+  },
+  "Diploma Computer Engineering": {
+    course: "Diploma Computer Engineering",
+    topics: ["Programming with Python", "HTML, CSS and JavaScript", "DBMS and SQL", "Computer Networks"],
+    next: "Explore lateral-entry B.E./B.Tech, internships, web development, or IT support."
+  },
+  "Diploma Other": {
+    course: "Diploma Studies",
+    topics: ["Core branch subjects", "Practical Skills", "Communication Skills"],
+    next: "Explore relevant degree courses, internships, and jobs in your branch."
+  },
+  "BCA": {
+    course: "Bachelor of Computer Applications",
+    topics: ["Programming", "DBMS", "Web Development", "Software Engineering"],
+    next: "Explore MCA, software internships, and entry-level IT roles."
+  },
+  "BTech": {
+    course: "B.Tech / B.E.",
+    topics: ["Core Engineering Subjects", "Projects", "Programming", "Internships"],
+    next: "Explore advanced studies, placements, and jobs related to your branch."
+  },
+  "Other": {
+    course: "Personalized Study Guidance",
+    topics: ["Subject Fundamentals", "Digital Skills", "Communication Skills"],
+    next: "Choose a course according to your current qualification and interests."
+  }
+};
+
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("username").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const education = document.getElementById("education").value;
+
+  if (!name || !/^[0-9]{10}$/.test(phone) || !education) {
+    alert("Please enter valid details.");
+    return;
+  }
+
+  currentStudent = { name, phone, education };
+
+  // Demo only: save a student record in this browser.
+  const users = getUsers();
+  const index = users.findIndex(u => u.phone === phone);
+
+  const record = { name, phone, education };
+
+  if (index >= 0) {
+    users[index] = record;
+  } else {
+    users.push(record);
+  }
+
+  saveUsers(users);
+  renderUsers();
+  showStudyInfo(currentStudent);
+  showPage("usersPage");
+});
+
+function renderUsers() {
+  const users = getUsers();
+  document.getElementById("total").textContent = users.length;
+
+  const tbody = document.getElementById("usersTable");
+  tbody.replaceChildren();
+
+  users.forEach((user, index) => {
+    const tr = document.createElement("tr");
+
+    [index + 1, user.name, user.phone, user.education]
+      .forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+
+    const action = document.createElement("td");
+    const button = document.createElement("button");
+    button.textContent = "View Study";
+    button.onclick = () => {
+      currentStudent = user;
+      showStudyInfo(user);
+      showPage("studyPage");
+    };
+
+    action.appendChild(button);
+    tr.appendChild(action);
+    tbody.appendChild(tr);
+  });
+}
+
+function showStudyInfo(student) {
+  const data = studyData[student.education] || studyData.Other;
+
+  document.getElementById("welcome").textContent =
+    "Welcome, " + student.name;
+
+  document.getElementById("courseName").textContent =
+    "Your Education: " + data.course;
+
+  const list = document.getElementById("topics");
+  list.replaceChildren();
+
+  data.topics.forEach(topic => {
+    const li = document.createElement("li");
+    li.textContent = topic;
+    list.appendChild(li);
+  });
+
+  document.getElementById("nextOptions").textContent = data.next;
+}
+
+renderUsers();
+showPage("loginPage");
+</script>
+
+</body>
+</html>
